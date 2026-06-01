@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Constelaciones del Equipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syne:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep: #03050f;
+    --void: #070b1a;
+    --nebula: #0d1535;
+    --violet: #7b5ea7;
+    --violet-glow: #a87fd4;
+    --stardust: #c9b8e8;
+    --nova: #e8deff;
+    --starwhite: #f4f0ff;
+    --gold: #f0c96b;
+    --teal: #4fc4cf;
+    --rose: #e87fa7;
+    --glass: rgba(123,94,167,0.12);
+    --glass-border: rgba(200,180,240,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--deep);
+    font-family: 'Syne', sans-serif;
+    color: var(--nova);
+    overflow: hidden;
+  }
+
+  /* ── CANVAS DE ESTRELLAS ── */
+  #starfield {
+    position: fixed; inset: 0; z-index: 0;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.9s cubic-bezier(.4,0,.2,1);
+  }
+  .screen.active {
+    opacity: 1; pointer-events: all;
+  }
+
+  /* ── BIENVENIDA ── */
+  #s-welcome .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    text-align: center;
+    color: var(--starwhite);
+    letter-spacing: -0.01em;
+    max-width: 720px;
+    margin-bottom: 1.2rem;
+  }
+  #s-welcome .tagline em {
+    font-style: italic;
+    color: var(--stardust);
+  }
+  #s-welcome .sub {
+    font-size: .9rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--violet-glow);
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  #s-welcome .name-entry {
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+    width: 100%; max-width: 380px;
+  }
+  #s-welcome .name-entry label {
+    font-size: .78rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--stardust);
+  }
+  #s-welcome .name-entry input {
+    width: 100%;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 40px;
+    padding: .85rem 1.6rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--starwhite);
+    text-align: center;
+    outline: none;
+    transition: border-color .3s, box-shadow .3s;
+    backdrop-filter: blur(12px);
+  }
+  #s-welcome .name-entry input::placeholder { color: rgba(200,180,240,.3); }
+  #s-welcome .name-entry input:focus {
+    border-color: var(--violet-glow);
+    box-shadow: 0 0 28px rgba(168,127,212,.25);
+  }
+
+  /* ── BOTONES ── */
+  .btn {
+    position: relative;
+    padding: .85rem 2.4rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 40px;
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    color: var(--nova);
+    font-family: 'Syne', sans-serif;
+    font-size: .8rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .3s, border-color .3s, box-shadow .3s, transform .2s;
+    overflow: hidden;
+  }
+  .btn:hover {
+    background: rgba(123,94,167,.28);
+    border-color: var(--violet-glow);
+    box-shadow: 0 0 32px rgba(168,127,212,.3);
+    transform: translateY(-2px);
+  }
+  .btn:active { transform: translateY(0); }
+  .btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── PASOS ── */
+  .step-number {
+    font-size: .72rem; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--violet-glow); margin-bottom: 1.4rem;
+    display: flex; align-items: center; gap: .8rem;
+  }
+  .step-number::before, .step-number::after {
+    content: ''; display: block; height: 1px;
+    width: 48px; background: var(--glass-border);
+  }
+  .step-icon {
+    font-size: 3rem; margin-bottom: 1rem;
+    filter: drop-shadow(0 0 16px rgba(168,127,212,.5));
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100%{ transform: translateY(0); }
+    50%{ transform: translateY(-8px); }
+  }
+  .step-prompt {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+    font-weight: 300;
+    text-align: center;
+    color: var(--starwhite);
+    max-width: 640px;
+    line-height: 1.2;
+    margin-bottom: .8rem;
+  }
+  .step-hint {
+    font-size: .82rem; color: var(--stardust); text-align: center;
+    max-width: 440px; line-height: 1.65; margin-bottom: 2.4rem;
+    opacity: .8;
+  }
+  .step-textarea {
+    width: 100%; max-width: 480px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 1.2rem 1.6rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--starwhite);
+    resize: none;
+    outline: none;
+    min-height: 120px;
+    transition: border-color .3s, box-shadow .3s;
+    backdrop-filter: blur(12px);
+    line-height: 1.6;
+    margin-bottom: 1.6rem;
+  }
+  .step-textarea::placeholder { color: rgba(200,180,240,.3); }
+  .step-textarea:focus {
+    border-color: var(--violet-glow);
+    box-shadow: 0 0 28px rgba(168,127,212,.2);
+  }
+
+  /* ── PROGRESS ── */
+  .progress-dots {
+    display: flex; gap: .6rem; margin-bottom: 2.8rem;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--glass-border);
+    transition: background .4s, transform .4s;
+  }
+  .dot.active { background: var(--violet-glow); transform: scale(1.4); }
+  .dot.done { background: var(--violet); }
+
+  /* ── CONSTELLATION VIEW ── */
+  #s-constellation canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+  }
+  .constellation-info {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    z-index: 20;
+  }
+  .const-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    border-radius: 16px;
+    padding: .9rem 1.4rem;
+    max-width: 200px;
+    text-align: center;
+  }
+  .const-card .icon { font-size: 1.4rem; display: block; margin-bottom: .3rem; }
+  .const-card .label {
+    font-size: .65rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--violet-glow); display: block; margin-bottom: .4rem;
+  }
+  .const-card .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; color: var(--starwhite); line-height: 1.4;
+  }
+  .const-name {
+    position: absolute; top: 2.5rem; left: 50%; transform: translateX(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 300; color: var(--starwhite);
+    text-align: center; white-space: nowrap;
+    z-index: 20;
+  }
+  .const-name span {
+    display: block; font-family: 'Syne', sans-serif;
+    font-size: .7rem; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--violet-glow); margin-bottom: .3rem;
+  }
+  .const-actions {
+    position: absolute; bottom: 2rem; right: 2rem;
+    display: flex; gap: .8rem; z-index: 20;
+  }
+
+  /* ── UNIVERSE VIEW ── */
+  #s-universe canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+  }
+  .universe-title {
+    position: absolute; top: 2rem; left: 50%; transform: translateX(-50%);
+    text-align: center; z-index: 20;
+  }
+  .universe-title h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 300;
+    color: var(--starwhite);
+  }
+  .universe-title p {
+    font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--violet-glow); margin-top: .3rem;
+  }
+  .universe-back {
+    position: absolute; top: 2rem; left: 2rem; z-index: 20;
+  }
+  .member-tooltip {
+    position: absolute; z-index: 30;
+    background: rgba(7,11,26,.92);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 1.4rem 1.8rem;
+    max-width: 280px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .3s, transform .3s;
+  }
+  .member-tooltip.visible { opacity: 1; transform: translateY(0); }
+  .member-tooltip h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 300; color: var(--starwhite);
+    margin-bottom: .8rem;
+  }
+  .member-tooltip .item {
+    display: flex; gap: .6rem; align-items: flex-start;
+    margin-bottom: .5rem; font-size: .82rem; color: var(--stardust);
+    line-height: 1.4;
+  }
+  .member-tooltip .item .ico { flex-shrink: 0; font-size: 1rem; }
+  .click-hint {
+    font-size: .68rem; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--violet-glow); margin-top: .8rem; opacity: .7;
+  }
+
+  /* ── MODAL CONSTELLATION ── */
+  #modal-overlay {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(3,5,15,.85);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .5s;
+  }
+  #modal-overlay.visible { opacity: 1; pointer-events: all; }
+  #modal-box {
+    position: relative;
+    width: min(92vw, 700px);
+    height: min(88vh, 580px);
+  }
+  #modal-box canvas { width: 100%; height: 100%; border-radius: 24px; }
+  .modal-close {
+    position: absolute; top: -2.5rem; right: 0;
+    background: none; border: none;
+    color: var(--stardust); font-size: .78rem;
+    letter-spacing: .2em; text-transform: uppercase;
+    cursor: pointer; opacity: .7;
+    transition: opacity .2s;
+  }
+  .modal-close:hover { opacity: 1; }
+  .modal-delete {
+    position: absolute; top: -2.5rem; left: 0;
+    background: none; border: none;
+    color: var(--rose); font-size: .78rem;
+    letter-spacing: .2em; text-transform: uppercase;
+    cursor: pointer; opacity: .7;
+    transition: opacity .2s;
+  }
+  .modal-delete:hover { opacity: 1; }
+
+  /* ── REVEAL ANIMATION ── */
+  .reveal { animation: reveal .7s cubic-bezier(.4,0,.2,1) both; }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal-d1 { animation-delay: .1s; }
+  .reveal-d2 { animation-delay: .22s; }
+  .reveal-d3 { animation-delay: .34s; }
+  .reveal-d4 { animation-delay: .46s; }
+  .reveal-d5 { animation-delay: .58s; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--violet-glow), transparent);
+    margin: 1.2rem auto;
+  }
+
+  /* ── GALAXY BG OVERLAY ── */
+  .nebula-blob {
+    position: fixed; border-radius: 50%;
+    filter: blur(80px); opacity: .07; pointer-events: none; z-index: 1;
+  }
+
+  @media (max-width: 600px) {
+    .constellation-info { bottom: 1rem; gap: .6rem; }
+    .const-card { max-width: 150px; padding: .7rem 1rem; }
+    .const-actions { bottom: 1rem; right: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<!-- Nebula blobs -->
+<div class="nebula-blob" style="width:600px;height:600px;background:#7b5ea7;top:-200px;left:-200px;"></div>
+<div class="nebula-blob" style="width:500px;height:500px;background:#4fc4cf;bottom:-200px;right:-100px;"></div>
+<div class="nebula-blob" style="width:400px;height:400px;background:#e87fa7;top:40%;left:60%;"></div>
+
+<!-- ═══ SCREEN: BIENVENIDA ═══ -->
+<div id="s-welcome" class="screen active">
+  <p class="sub reveal">Constelaciones del Equipo</p>
+  <h1 class="tagline reveal reveal-d1">Eres mucho más<br>que tu <em>cargo.</em></h1>
+  <div class="divider reveal reveal-d2"></div>
+  <p style="font-size:.88rem;color:var(--stardust);text-align:center;max-width:400px;line-height:1.7;margin-bottom:2.4rem;" class="reveal reveal-d3">
+    Cada persona es una estrella única. Juntos formamos una constelación.<br>
+    Comparte tres destellos de quién eres.
+  </p>
+  <div class="name-entry reveal reveal-d4">
+    <label>¿Cómo te llamas?</label>
+    <input type="text" id="input-name" placeholder="Tu nombre…" autocomplete="off" maxlength="40">
+    <button class="btn" onclick="startJourney()">Comenzar el viaje →</button>
+  </div>
+  <button class="btn reveal reveal-d5" style="margin-top:1.2rem;opacity:.6;font-size:.72rem;" onclick="showUniverse()">Ver el Universo del Equipo</button>
+</div>
+
+<!-- ═══ SCREEN: PASO 1 ═══ -->
+<div id="s-step1" class="screen">
+  <div class="progress-dots">
+    <div class="dot active" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+  </div>
+  <div class="step-number">Primer destello</div>
+  <div class="step-icon">🚀</div>
+  <h2 class="step-prompt">¿Qué te da energía?</h2>
+  <p class="step-hint">Piensa en aquello que te llena de vida. Una pasión, algo que haces y el tiempo vuela, algo que te hace brillar.</p>
+  <textarea class="step-textarea" id="input-energy" placeholder="Lo que me enciende es…" maxlength="200"></textarea>
+  <button class="btn" onclick="goStep(2)">Siguiente destello →</button>
+</div>
+
+<!-- ═══ SCREEN: PASO 2 ═══ -->
+<div id="s-step2" class="screen">
+  <div class="progress-dots">
+    <div class="dot done"></div>
+    <div class="dot active"></div>
+    <div class="dot" id="dot3b"></div>
+  </div>
+  <div class="step-number">Segundo destello</div>
+  <div class="step-icon">🌱</div>
+  <h2 class="step-prompt">¿Qué quieres desarrollar?</h2>
+  <p class="step-hint">Una habilidad, un aprendizaje, una meta… Algo que sientes que quiere crecer dentro de ti.</p>
+  <textarea class="step-textarea" id="input-growth" placeholder="Quiero desarrollar…" maxlength="200"></textarea>
+  <button class="btn" onclick="goStep(3)">Último destello →</button>
+</div>
+
+<!-- ═══ SCREEN: PASO 3 ═══ -->
+<div id="s-step3" class="screen">
+  <div class="progress-dots">
+    <div class="dot done"></div>
+    <div class="dot done"></div>
+    <div class="dot active"></div>
+  </div>
+  <div class="step-number">Tercer destello</div>
+  <div class="step-icon">⭐</div>
+  <h2 class="step-prompt">¿Qué te representa?</h2>
+  <p class="step-hint">Una frase, un lugar, un objeto, una imagen, una idea. Aquello que, si alguien lo viera, diría: "eso eres tú".</p>
+  <textarea class="step-textarea" id="input-identity" placeholder="Lo que me representa es…" maxlength="200"></textarea>
+  <button class="btn" onclick="finishJourney()">Revelar mi constelación ✦</button>
+</div>
+
+<!-- ═══ SCREEN: CONSTELACIÓN PERSONAL ═══ -->
+<div id="s-constellation" class="screen">
+  <div class="const-name">
+    <span>Tu constelación</span>
+    <span id="const-name-text">—</span>
+  </div>
+  <canvas id="myConstellationCanvas"></canvas>
+  <div class="constellation-info" id="const-cards"></div>
+  <div class="const-actions">
+    <button class="btn" style="font-size:.72rem;" onclick="saveToTeam()">Unirme al universo ✦</button>
+    <button class="btn" style="font-size:.72rem;opacity:.6;" onclick="showScreen('s-welcome')">Volver</button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: UNIVERSO ═══ -->
+<div id="s-universe" class="screen">
+  <div class="universe-title">
+    <h2>Universo del Equipo</h2>
+    <p>Explora las constelaciones de tu equipo</p>
+  </div>
+  <canvas id="universeCanvas"></canvas>
+  <div class="universe-back">
+    <button class="btn" style="font-size:.72rem;opacity:.6;" onclick="showScreen('s-welcome')">← Inicio</button>
+  </div>
+  <div class="member-tooltip" id="member-tooltip"></div>
+</div>
+
+<!-- ═══ MODAL: CONSTELACIÓN DE OTRO ═══ -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <button class="modal-delete" id="modal-delete-btn">🗑️ Eliminar</button>
+    <button class="modal-close" onclick="closeModal()">✕ Cerrar</button>
+    <canvas id="modalCanvas"></canvas>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════
+// ESTADO Y BASE DE DATOS
+// ══════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/a/macros/saludhorisoes.org/s/AKfycbwtlE_Td-UlDK3o5fNg9Qzq3cEBtYXgL9BxaarXvXVLz9JNHWTqb18bSQBeeSofHkb7/exec';
+let userData = { name:'', energy:'', growth:'', identity:'' };
+let currentScreen = 's-welcome';
+let team = []; // Se cargará de Google Sheets
+let universeAnim, modalAnim;
+
+// Cargar equipo inicial
+async function fetchTeam() {
+  try {
+    const res = await fetch(SCRIPT_URL);
+    team = await res.json();
+  } catch (e) {
+    console.error('Error al cargar datos:', e);
+  }
+}
+fetchTeam();
+
+// ══════════════════════════════════
+// STARFIELD
+// ══════════════════════════════════
+(function initStarfield(){
+  const c = document.getElementById('starfield');
+  const ctx = c.getContext('2d');
+  let stars = [];
+  function resize(){
+    c.width = innerWidth; c.height = innerHeight;
+    stars = Array.from({length: Math.floor(innerWidth*innerHeight/3000)}, () => ({
+      x: Math.random()*c.width, y: Math.random()*c.height,
+      r: Math.random()*1.6+.2,
+      a: Math.random(),
+      speed: Math.random()*.004+.001,
+      twinkle: Math.random()*Math.PI*2
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    const t = Date.now()/1000;
+    stars.forEach(s=>{
+      s.twinkle += s.speed;
+      const alpha = s.a * (.5 + .5*Math.sin(s.twinkle));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(220,210,255,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); window.addEventListener('resize', resize);
+  draw();
+})();
+
+// ══════════════════════════════════
+// NAVEGACIÓN
+// ══════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('active');
+  });
+  setTimeout(()=>{
+    document.getElementById(id).classList.add('active');
+    currentScreen = id;
+  }, 10);
+}
+
+function startJourney(){
+  const name = document.getElementById('input-name').value.trim();
+  if(!name){ shake(document.getElementById('input-name')); return; }
+  userData.name = name;
+  showScreen('s-step1');
+}
+
+function goStep(n){
+  if(n===2){
+    const v = document.getElementById('input-energy').value.trim();
+    if(!v){ shake(document.getElementById('input-energy')); return; }
+    userData.energy = v;
+    showScreen('s-step2');
+  } else if(n===3){
+    const v = document.getElementById('input-growth').value.trim();
+    if(!v){ shake(document.getElementById('input-growth')); return; }
+    userData.growth = v;
+    showScreen('s-step3');
+  }
+}
+
+function finishJourney(){
+  const v = document.getElementById('input-identity').value.trim();
+  if(!v){ shake(document.getElementById('input-identity')); return; }
+  userData.identity = v;
+  showScreen('s-constellation');
+  document.getElementById('const-name-text').textContent = userData.name;
+  buildConstCards();
+  drawPersonalConstellation('myConstellationCanvas', userData, true);
+}
+
+async function saveToTeam(){
+  // Actualización optimista
+  const exists = team.findIndex(m=>m.name===userData.name);
+  const entry = {...userData};
+  if(exists>=0) team[exists]=entry; else team.push(entry);
+  
+  showScreen('s-universe');
+  initUniverseCanvas();
+
+  // Guardar en Google Sheets en segundo plano
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'add', data: userData })
+    });
+    await fetchTeam(); // Refrescar con datos reales
+    if(currentScreen === 's-universe') initUniverseCanvas();
+  } catch (e) {
+    console.error('Error guardando estrella:', e);
+  }
+}
+
+async function showUniverse(){
+  showScreen('s-universe');
+  initUniverseCanvas();
+  // Refrescar datos
+  await fetchTeam();
+  if(currentScreen === 's-universe') initUniverseCanvas();
+}
+
+function shake(el){
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = 'shake .4s ease';
+  el.style.borderColor = 'var(--rose)';
+  setTimeout(()=>{ el.style.borderColor=''; el.style.animation=''; }, 600);
+}
+
+// ══════════════════════════════════
+// CARDS
+// ══════════════════════════════════
+function buildConstCards(){
+  const c = document.getElementById('const-cards');
+  c.innerHTML = `
+    <div class="const-card">
+      <span class="icon">🚀</span>
+      <span class="label">Me da energía</span>
+      <span class="value">${esc(userData.energy)}</span>
+    </div>
+    <div class="const-card">
+      <span class="icon">🌱</span>
+      <span class="label">Quiero desarrollar</span>
+      <span class="value">${esc(userData.growth)}</span>
+    </div>
+    <div class="const-card">
+      <span class="icon">⭐</span>
+      <span class="label">Me representa</span>
+      <span class="value">${esc(userData.identity)}</span>
+    </div>
+  `;
+}
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ══════════════════════════════════
+// CANVAS: CONSTELACIÓN PERSONAL
+// ══════════════════════════════════
+function drawPersonalConstellation(canvasId, member, animate){
+  const canvas = document.getElementById(canvasId);
+  const parent = canvas.parentElement;
+  canvas.width = parent.clientWidth || innerWidth;
+  canvas.height = parent.clientHeight || innerHeight;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+
+  // Star positions
+  const STARS = [
+    { label:'🚀', text: member.energy,    angle: -Math.PI/2,         dist: Math.min(W,H)*0.28, color:'#f0c96b' },
+    { label:'🌱', text: member.growth,    angle: -Math.PI/2+2.094,   dist: Math.min(W,H)*0.28, color:'#4fc4cf' },
+    { label:'⭐', text: member.identity,  angle: -Math.PI/2+4.189,   dist: Math.min(W,H)*0.28, color:'#e87fa7' },
+  ];
+
+  let progress = 0;
+  const DURATION = animate ? 1800 : 0;
+  const start = performance.now();
+
+  function frame(now){
+    progress = animate ? Math.min((now-start)/DURATION, 1) : 1;
+    const ease = 1 - Math.pow(1-progress, 3);
+
+    ctx.clearRect(0,0,W,H);
+
+    // Draw lines
+    STARS.forEach(s=>{
+      const sx = cx + Math.cos(s.angle)*s.dist*ease;
+      const sy = cy + Math.sin(s.angle)*s.dist*ease;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(sx, sy);
+      const grad = ctx.createLinearGradient(cx,cy,sx,sy);
+      grad.addColorStop(0, 'rgba(168,127,212,0.5)');
+      grad.addColorStop(1, s.color+'44');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([4,6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // Center star
+    drawStar(ctx, cx, cy, 28*ease, '#a87fd4', member.name, true);
+
+    // Outer stars
+    STARS.forEach((s, i)=>{
+      const sx = cx + Math.cos(s.angle)*s.dist*ease;
+      const sy = cy + Math.sin(s.angle)*s.dist*ease;
+      if(progress > i/3){
+        drawStar(ctx, sx, sy, 18*ease, s.color, s.label+' '+truncate(s.text,28), false, s.angle);
+      }
+    });
+
+    // Particle trail
+    if(animate && progress < 1){
+      STARS.forEach(s=>{
+        for(let p=0;p<3;p++){
+          const t = Math.random();
+          const px = cx + Math.cos(s.angle)*s.dist*ease*t;
+          const py = cy + Math.sin(s.angle)*s.dist*ease*t;
+          ctx.beginPath();
+          ctx.arc(px, py, Math.random()*2, 0, Math.PI*2);
+          ctx.fillStyle = s.color+'88';
+          ctx.fill();
+        }
+      });
+    }
+
+    if(progress<1) requestAnimationFrame(frame);
+    else {
+      // Final shimmer loop
+      shimmerLoop(ctx, W, H, cx, cy, STARS, member);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function shimmerLoop(ctx, W, H, cx, cy, STARS, member){
+  let t = 0;
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    t += 0.018;
+
+    STARS.forEach(s=>{
+      const sx = cx + Math.cos(s.angle)*s.dist;
+      const sy = cy + Math.sin(s.angle)*s.dist;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(sx,sy);
+      const grad = ctx.createLinearGradient(cx,cy,sx,sy);
+      grad.addColorStop(0,'rgba(168,127,212,0.4)');
+      grad.addColorStop(1,s.color+'33');
+      ctx.strokeStyle=grad; ctx.lineWidth=1.2;
+      ctx.setLineDash([4,6]); ctx.stroke(); ctx.setLineDash([]);
+    });
+
+    const pulse = 1 + .06*Math.sin(t);
+    drawStar(ctx, cx, cy, 28*pulse, '#a87fd4', member.name, true);
+
+    STARS.forEach((s,i)=>{
+      const sx = cx + Math.cos(s.angle)*s.dist;
+      const sy = cy + Math.sin(s.angle)*s.dist;
+      const p2 = 1 + .08*Math.sin(t + i*1.2);
+      drawStar(ctx, sx, sy, 18*p2, s.color, s.label+' '+truncate(s.text,28), false, s.angle);
+    });
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function drawStar(ctx, x, y, r, color, label, isCenter, angle){
+  // Glow
+  const grd = ctx.createRadialGradient(x,y,0,x,y,r*2.8);
+  grd.addColorStop(0, color+'88');
+  grd.addColorStop(1, 'transparent');
+  ctx.beginPath(); ctx.arc(x,y,r*2.8,0,Math.PI*2);
+  ctx.fillStyle=grd; ctx.fill();
+
+  // Core
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=color; ctx.fill();
+
+  // Inner shine
+  ctx.beginPath(); ctx.arc(x-r*.25,y-r*.25,r*.35,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.4)'; ctx.fill();
+
+  // Label
+  if(!label) return;
+  ctx.save();
+  ctx.font = isCenter
+    ? `300 ${Math.max(12,r*.8)}px 'Cormorant Garamond', serif`
+    : `300 ${Math.max(10,r*.55)}px 'Syne', sans-serif`;
+  ctx.fillStyle = isCenter ? '#f4f0ff' : '#c9b8e8';
+  ctx.textAlign = 'center';
+
+  if(isCenter){
+    ctx.fillText(label, x, y + r*1.8);
+  } else {
+    // Position label away from center
+    const ang = angle !== undefined ? angle : 0;
+    const lx = x + Math.cos(ang)*r*2.4;
+    const ly = y + Math.sin(ang)*r*2.4;
+    // Multi-line
+    const words = label.split(' ');
+    let lines = [], cur = '';
+    words.forEach(w=>{
+      if((cur+w).length > 22){ lines.push(cur.trim()); cur=w+' '; }
+      else cur += w+' ';
+    });
+    if(cur.trim()) lines.push(cur.trim());
+    lines.slice(0,3).forEach((line,i)=>{
+      ctx.fillText(line, lx, ly + i*14);
+    });
+  }
+  ctx.restore();
+}
+
+function truncate(s,n){ return s.length>n ? s.slice(0,n)+'…' : s; }
+
+// ══════════════════════════════════
+// CANVAS: UNIVERSO DEL EQUIPO
+// ══════════════════════════════════
+function initUniverseCanvas(){
+  const canvas = document.getElementById('universeCanvas');
+  const W = canvas.width = innerWidth;
+  const H = canvas.height = innerHeight;
+  const ctx = canvas.getContext('2d');
+  const tooltip = document.getElementById('member-tooltip');
+
+  if(!team.length){
+    ctx.clearRect(0,0,W,H);
+    ctx.font = "300 1.1rem 'Cormorant Garamond', serif";
+    ctx.fillStyle = 'rgba(200,180,240,.4)';
+    ctx.textAlign = 'center';
+    ctx.fillText('Aún no hay estrellas. Sé el primero en unirte.', W/2, H/2);
+    return;
+  }
+
+  // Lay out member stars
+  const stars = team.map((m,i)=>{
+    const angle = (Math.PI*2/team.length)*i - Math.PI/2;
+    const dist = Math.min(W,H)*0.28 + Math.sin(i*1.3)*30;
+    return {
+      m,
+      x: W/2 + Math.cos(angle)*dist,
+      y: H/2 + Math.sin(angle)*dist,
+      r: 16 + Math.random()*8,
+      color: ['#f0c96b','#4fc4cf','#e87fa7','#a87fd4','#7bd4a8','#f0956b'][i%6],
+      twinkle: Math.random()*Math.PI*2,
+      speed: Math.random()*.02+.008
+    };
+  });
+
+  let hovered = null;
+  let t = 0;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    t += 0.012;
+
+    // Center galactic core
+    const coreGrd = ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,120);
+    coreGrd.addColorStop(0,'rgba(123,94,167,.18)');
+    coreGrd.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(W/2,H/2,120,0,Math.PI*2);
+    ctx.fillStyle=coreGrd; ctx.fill();
+
+    // Connection lines
+    stars.forEach((s1,i)=>{
+      stars.forEach((s2,j)=>{
+        if(j<=i) return;
+        const dist = Math.hypot(s1.x-s2.x,s1.y-s2.y);
+        if(dist < 220){
+          ctx.beginPath(); ctx.moveTo(s1.x,s1.y); ctx.lineTo(s2.x,s2.y);
+          ctx.strokeStyle=`rgba(168,127,212,${.08*(1-dist/220)})`;
+          ctx.lineWidth=.8; ctx.setLineDash([3,8]); ctx.stroke(); ctx.setLineDash([]);
+        }
+      });
+    });
+
+    stars.forEach(s=>{
+      s.twinkle += s.speed;
+      const pulse = 1 + .1*Math.sin(s.twinkle);
+      const isHov = s === hovered;
+
+      // Glow
+      const grd = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*(isHov?4:3)*pulse);
+      grd.addColorStop(0, s.color+(isHov?'cc':'66'));
+      grd.addColorStop(1,'transparent');
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r*(isHov?4:3)*pulse,0,Math.PI*2);
+      ctx.fillStyle=grd; ctx.fill();
+
+      // Core
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r*pulse*(isHov?1.3:1),0,Math.PI*2);
+      ctx.fillStyle=s.color; ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x-s.r*.25,s.y-s.r*.25,s.r*.3,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,.5)'; ctx.fill();
+
+      // Name
+      ctx.save();
+      ctx.font = `300 ${isHov?13:11}px 'Syne', sans-serif`;
+      ctx.fillStyle = isHov ? '#f4f0ff' : 'rgba(201,184,232,.7)';
+      ctx.textAlign='center';
+      ctx.fillText(s.m.name, s.x, s.y + s.r*2.2*pulse);
+      ctx.restore();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // Mouse
+  canvas.addEventListener('mousemove', e=>{
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    hovered = stars.find(s=>Math.hypot(s.x-mx,s.y-my)<s.r*2.5) || null;
+    canvas.style.cursor = hovered ? 'pointer' : 'default';
+
+    if(hovered){
+      tooltip.innerHTML = `
+        <h3>${hovered.m.name}</h3>
+        <div class="item"><span class="ico">🚀</span><span>${esc(hovered.m.energy)}</span></div>
+        <div class="item"><span class="ico">🌱</span><span>${esc(hovered.m.growth)}</span></div>
+        <div class="item"><span class="ico">⭐</span><span>${esc(hovered.m.identity)}</span></div>
+        <p class="click-hint">Haz clic para ver su constelación</p>
+      `;
+      let tx = e.clientX + 20, ty = e.clientY - 20;
+      if(tx + 300 > innerWidth) tx = e.clientX - 300;
+      if(ty + 200 > innerHeight) ty = e.clientY - 200;
+      tooltip.style.left = tx+'px'; tooltip.style.top = ty+'px';
+      tooltip.classList.add('visible');
+    } else {
+      tooltip.classList.remove('visible');
+    }
+  });
+
+  canvas.addEventListener('mouseleave', ()=>{
+    hovered = null;
+    tooltip.classList.remove('visible');
+  });
+
+  canvas.addEventListener('click', e=>{
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const clicked = stars.find(s=>Math.hypot(s.x-mx,s.y-my)<s.r*2.5);
+    if(clicked) openModal(clicked.m);
+  });
+
+  // Touch
+  canvas.addEventListener('touchend', e=>{
+    const touch = e.changedTouches[0];
+    const rect = canvas.getBoundingClientRect();
+    const mx = touch.clientX - rect.left, my = touch.clientY - rect.top;
+    const clicked = stars.find(s=>Math.hypot(s.x-mx,s.y-my)<s.r*3);
+    if(clicked) openModal(clicked.m);
+  });
+}
+
+// ══════════════════════════════════
+// MODAL
+// ══════════════════════════════════
+function openModal(member){
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('visible');
+  const box = document.getElementById('modal-box');
+  const mc = document.getElementById('modalCanvas');
+  mc.width = box.clientWidth;
+  mc.height = box.clientHeight;
+  
+  const deleteBtn = document.getElementById('modal-delete-btn');
+  if(deleteBtn) {
+    deleteBtn.onclick = () => deleteMember(member.name);
+  }
+
+  drawPersonalConstellation('modalCanvas', member, true);
+  // Draw cards inside modal
+  const existing = document.getElementById('modal-cards');
+  if(existing) existing.remove();
+  const cards = document.createElement('div');
+  cards.id = 'modal-cards';
+  cards.style.cssText = `
+    position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
+    display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; z-index:55;
+  `;
+  cards.innerHTML = `
+    <div class="const-card"><span class="icon">🚀</span><span class="label">Me da energía</span><span class="value">${esc(member.energy)}</span></div>
+    <div class="const-card"><span class="icon">🌱</span><span class="label">Quiero desarrollar</span><span class="value">${esc(member.growth)}</span></div>
+    <div class="const-card"><span class="icon">⭐</span><span class="label">Me representa</span><span class="value">${esc(member.identity)}</span></div>
+  `;
+  box.appendChild(cards);
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('visible');
+}
+document.getElementById('modal-overlay').addEventListener('click', e=>{
+  if(e.target===e.currentTarget) closeModal();
+});
+
+async function deleteMember(name){
+  if(confirm('¿Estás seguro de que quieres eliminar esta estrella del universo?')) {
+    // Actualización optimista
+    team = team.filter(m => m.name !== name);
+    closeModal();
+    if(currentScreen === 's-universe') initUniverseCanvas();
+
+    // Eliminar en Google Sheets en segundo plano
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'delete', name: name })
+      });
+      await fetchTeam();
+      if(currentScreen === 's-universe') initUniverseCanvas();
+    } catch (e) {
+      console.error('Error eliminando estrella:', e);
+    }
+  }
+}
+
+// ══════════════════════════════════
+// SHAKE CSS
+// ══════════════════════════════════
+const shakeCSS = document.createElement('style');
+shakeCSS.textContent = `
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+}`;
+document.head.appendChild(shakeCSS);
+
+// ══════════════════════════════════
+// ENTER KEY
+// ══════════════════════════════════
+document.getElementById('input-name').addEventListener('keydown',e=>{ if(e.key==='Enter') startJourney(); });
+
+// Resize universeCanvas
+window.addEventListener('resize', ()=>{
+  if(currentScreen==='s-universe') initUniverseCanvas();
+});
+</script>
+</body>
+</html>
