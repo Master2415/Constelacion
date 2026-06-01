@@ -369,6 +369,9 @@
 </head>
 <body>
 
+<!-- Variables de configuración -->
+<script src="config.js"></script>
+
 <canvas id="starfield"></canvas>
 
 <!-- Nebula blobs -->
@@ -478,7 +481,7 @@
 // ══════════════════════════════════
 // ESTADO Y BASE DE DATOS
 // ══════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/a/macros/saludhorisoes.org/s/AKfycbwtlE_Td-UlDK3o5fNg9Qzq3cEBtYXgL9BxaarXvXVLz9JNHWTqb18bSQBeeSofHkb7/exec';
+// SCRIPT_URL ahora se lee desde config.js
 let userData = { name:'', energy:'', growth:'', identity:'' };
 let currentScreen = 's-welcome';
 let team = []; // Se cargará de Google Sheets
