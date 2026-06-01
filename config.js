@@ -1,4 +1,4 @@
 // config.js
 // Este archivo contiene la información sensible y no se subirá a GitHub.
-const SCRIPT_URL = 'https://script.google.com/a/macros/saludhorisoes.org/s/AKfycbwtlE_Td-UlDK3o5fNg9Qzq3cEBtYXgL9BxaarXvXVLz9JNHWTqb18bSQBeeSofHkb7/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwb9YevicFC9kT7GhtBPiJE6x6pimhyoUp4sTKl0RoPd4Zr0adkVLTWgSSo8hObZ1qV/exec';
 // Puedes añadir más variables aquí si lo necesitas
