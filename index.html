@@ -44,6 +44,7 @@
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     padding: 2rem;
+    overflow-y: auto; overflow-x: hidden;
     opacity: 0; pointer-events: none;
     transition: opacity 0.9s cubic-bezier(.4,0,.2,1);
   }
@@ -361,9 +362,44 @@
   }
 
   @media (max-width: 600px) {
-    .constellation-info { bottom: 1rem; gap: .6rem; }
-    .const-card { max-width: 150px; padding: .7rem 1rem; }
-    .const-actions { bottom: 1rem; right: 1rem; }
+    /* Permitir scroll si el teclado se abre */
+    .screen { justify-content: flex-start; padding-top: 10vh; }
+    #s-welcome { justify-content: center; padding-top: 2rem; }
+    #s-constellation, #s-universe { justify-content: center; padding-top: 0; }
+
+    /* Ajustar textos e inputs */
+    .step-prompt { font-size: 2rem; margin-bottom: 0.5rem; }
+    .step-textarea { min-height: 90px; margin-bottom: 1rem; padding: 1rem; }
+    .step-hint { margin-bottom: 1.5rem; font-size: 0.8rem; }
+    .btn { padding: .7rem 1.8rem; font-size: 0.75rem; }
+
+    /* Evitar que las tarjetas y los botones se solapen en constelación */
+    .constellation-info { 
+      bottom: 5.5rem; gap: .4rem; width: 95vw; 
+    }
+    .const-card { max-width: 31%; padding: .6rem .3rem; }
+    .const-card .label { font-size: 0.55rem; margin-bottom: 0.2rem; }
+    .const-card .value { font-size: 0.85rem; line-height: 1.2; }
+    
+    .const-actions { 
+      bottom: 1.5rem; left: 50%; transform: translateX(-50%); right: auto; 
+      width: 100%; justify-content: center; gap: 0.5rem;
+    }
+    .const-actions .btn { padding: 0.6rem 1rem; font-size: 0.65rem; }
+
+    /* Universo y Modales */
+    .universe-title h2 { font-size: 1.5rem; }
+    .universe-back { top: 1rem; left: 1rem; }
+    .universe-back .btn { padding: .5rem 1rem; }
+    
+    #modal-box { width: 92vw; height: 65vh; }
+    .modal-close { top: -2rem; right: 0.5rem; font-size: 0.7rem; }
+    .modal-delete { top: -2rem; left: 0.5rem; font-size: 0.7rem; }
+  }
+  
+  @media (max-height: 650px) {
+    .screen { justify-content: flex-start; padding-top: 5vh; }
+    #s-welcome { justify-content: center; padding-top: 2rem; }
   }
 </style>
 </head>
