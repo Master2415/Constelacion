@@ -1005,21 +1005,6 @@ function openModal(member){
   }
 
   drawPersonalConstellation('modalCanvas', member, true);
-  // Draw cards inside modal
-  const existing = document.getElementById('modal-cards');
-  if(existing) existing.remove();
-  const cards = document.createElement('div');
-  cards.id = 'modal-cards';
-  cards.style.cssText = `
-    position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
-    display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; z-index:55;
-  `;
-  cards.innerHTML = `
-    <div class="const-card"><span class="icon">🚀</span><span class="label">Me da energía</span><span class="value">${esc(member.energy)}</span></div>
-    <div class="const-card"><span class="icon">🌱</span><span class="label">Quiero desarrollar</span><span class="value">${esc(member.growth)}</span></div>
-    <div class="const-card"><span class="icon">⭐</span><span class="label">Me representa</span><span class="value">${esc(member.identity)}</span></div>
-  `;
-  box.appendChild(cards);
 }
 
 function closeModal(){
