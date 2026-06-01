@@ -980,6 +980,7 @@ function initUniverseCanvas(){
 
   // Touch
   canvas.addEventListener('touchend', e=>{
+    e.preventDefault(); // Evitar click duplicado en móviles
     const touch = e.changedTouches[0];
     const rect = canvas.getBoundingClientRect();
     const mx = touch.clientX - rect.left, my = touch.clientY - rect.top;
